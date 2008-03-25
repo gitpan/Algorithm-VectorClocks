@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 29;
+use Test::More tests => 27;
 
 use Algorithm::VectorClocks;
 use JSON::Any;
@@ -8,23 +8,24 @@ use JSON::Any;
 my $json = JSON::Any->new;
 
 my $vc_a = Algorithm::VectorClocks->new;
-ok $vc_a->id;
-   $vc_a->id('A');
-is $vc_a->id, 'A';
 is_deeply $vc_a->clocks, {};
 
-my $vc_b = Algorithm::VectorClocks->new('B');
-my $vc_c = Algorithm::VectorClocks->new('C');
+my $vc_b = Algorithm::VectorClocks->new;
+my $vc_c = Algorithm::VectorClocks->new;
 
-### in node A ###
+### in server A ###
+
+Algorithm::VectorClocks->id('A');
 
 $vc_a->increment;
 is_deeply $vc_a->clocks, { A => 1 };
 
 my $serialized_a = $vc_a->serialize;
-is_deeply $json->jsonToObj($serialized_a), { id => 'A', clocks => { A => 1 } };
+is_deeply $json->jsonToObj($serialized_a), { A => 1 };
 
-### in node B ###
+### in server B ###
+
+Algorithm::VectorClocks->id('B');
 
 $vc_b->merge($serialized_a);
 is_deeply $vc_b->clocks, { A => 1 };
@@ -34,7 +35,9 @@ is_deeply $vc_b->clocks, { A => 1, B => 1 };
 
 my $serialized_b = "$vc_b";
 
-### in node A ###
+### in server A ###
+
+Algorithm::VectorClocks->id('A');
 
 $vc_a += $serialized_b;
 is_deeply $vc_a->clocks, { A => 1, B => 1 };
@@ -49,7 +52,9 @@ ok   $vc_b eq $serialized_b;
 ok !($vc_b != $serialized_b);
 ok !($vc_b ne $serialized_b);
 
-### in node C ###
+### in server C ###
+
+Algorithm::VectorClocks->id('C');
 
 ok !$vc_b->equal($serialized_a);
 ok  $vc_b->not_equal($serialized_a);
@@ -64,22 +69,22 @@ my $serialized_c = "$vc_c";
 
 ### in client ###
 
-my @vcs = order_vector_clocks($serialized_a);
-is @vcs, 1;
-is $vcs[0]->id, 'A';
+my @res = order_vector_clocks({ A => $serialized_a });
+is @res, 1;
+is $res[0], 'A';
 
-@vcs = order_vector_clocks($serialized_a, $serialized_a);
-is @vcs, 2;
-is $vcs[0]->id, 'A';
-is $vcs[1]->id, 'A';
+@res = order_vector_clocks({ A => $serialized_a, B => $serialized_b });
+is @res, 2;
+is $res[0], 'A';
+is $res[1], 'B';
 
-@vcs = order_vector_clocks($serialized_c, $serialized_a);
-is @vcs, 1;
-is $vcs[0][0]->id, 'C';
-is $vcs[0][1]->id, 'A';
+@res = order_vector_clocks({ C => $serialized_c, A => $serialized_a });
+is @res, 1;
+like $res[0][0], qr/^[AC]$/;
+like $res[0][1], qr/^[AC]$/;
 
-@vcs = order_vector_clocks($serialized_a, $serialized_b, $serialized_c);
-is @vcs, 2;
-is $vcs[0][0]->id, 'A';
-is $vcs[0][1]->id, 'C';
-is $vcs[1]->id, 'B';
+@res = order_vector_clocks({ A => $serialized_a, B => $serialized_b, C => $serialized_c });
+is @res, 2;
+like $res[0][0], qr/^[AC]$/;
+like $res[0][1], qr/^[AC]$/;
+is $res[1], 'B';
