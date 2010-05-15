@@ -1,3 +1,11 @@
+2015-05-15  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.1.2:
+	* Build.PL
+	- fix dependency
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+
 2008-03-25  Takeru INOUE  <takeru.inoue _ gmail.com>
 
         * release 0.1.1:

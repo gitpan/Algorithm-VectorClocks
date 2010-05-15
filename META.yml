@@ -1,12 +1,22 @@
 ---
-name: Algorithm-VectorClocks
-version: 0.1.1
+abstract: 'Generating a partial ordering of events in a distributed system'
 author:
   - 'Takeru INOUE <takeru.inoue _ gmail.com>'
-abstract: Generating a partial ordering of events in a distributed system
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-VectorClocks
+provides:
+  Algorithm::VectorClocks:
+    file: lib/Algorithm/VectorClocks.pm
+    version: v0.1.2
 requires:
   Class::Accessor::Fast: 0
   Class::Data::Inheritable: 0
@@ -16,14 +26,6 @@ requires:
   Perl6::Export::Attrs: 0
   Sys::Hostname: 0
   version: 0
-build_requires:
-  Test::More: 0
-  Test::Perl::Critic: 0
-provides:
-  Algorithm::VectorClocks:
-    file: lib/Algorithm/VectorClocks.pm
-    version: 0.1.1
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.2

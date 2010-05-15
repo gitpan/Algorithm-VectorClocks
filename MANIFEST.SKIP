@@ -12,3 +12,4 @@
 \.cvsignore
 \.svn
 \.gz$
+^MYMETA.yml$
